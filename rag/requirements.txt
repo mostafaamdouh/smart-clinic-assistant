@@ -1,0 +1,7 @@
+chromadb
+langchain
+langchain-community
+sentence-transformers
+fastapi
+uvicorn
+pydantic
