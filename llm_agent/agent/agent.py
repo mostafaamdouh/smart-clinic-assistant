@@ -1,7 +1,13 @@
 from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
 from agent.llm import get_llm
-from agent.tools import check_available_slots, reserve_slot, release_slot, get_patient_history
+from agent.tools import (
+    check_available_slots,
+    reserve_slot,
+    release_slot,
+    get_patient_history,
+    retrieve_medical_context,
+)
 
 _agent_executor = None
 
@@ -38,7 +44,7 @@ Never ask for a doctor ID — you already know them. Never ask for information y
 
 def build_agent():
     llm = get_llm()
-    tools = [check_available_slots, reserve_slot, release_slot, get_patient_history]
+    tools = [check_available_slots,reserve_slot,release_slot,get_patient_history,retrieve_medical_context,]
     memory = MemorySaver()
     return create_react_agent(llm, tools, prompt=SYSTEM_PROMPT, checkpointer=memory)
 

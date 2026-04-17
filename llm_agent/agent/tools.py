@@ -6,6 +6,7 @@ from langchain_core.tools import tool
 load_dotenv()
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
+RAG_API_URL = os.getenv("RAG_API_URL", "http://127.0.0.1:8001")
 
 
 @tool
@@ -61,3 +62,17 @@ def get_patient_history(patient_id: str) -> str:
         return response.text
     except Exception as e:
         return f"Backend not available: {e}"
+
+
+@tool
+def retrieve_medical_context(query: str, n_results: int = 3) -> str:
+    """Retrieve relevant medical, doctor, or patient context from the RAG knowledge base."""
+    try:
+        response = requests.post(
+            f"{RAG_API_URL}/retrieve",
+            json={"query": query, "n_results": n_results},
+            timeout=20,
+        )
+        return response.text
+    except Exception as e:
+        return f"RAG API not available: {e}"
