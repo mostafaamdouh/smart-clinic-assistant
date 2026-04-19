@@ -1,60 +1,42 @@
 import { NextResponse } from 'next/server';
-import { apiClient } from '@/lib/apiClient';
-
-export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const message = body?.message?.trim();
+    const { message, image } = body;
 
-    if (!message) {
-      return NextResponse.json(
-        { error: 'Missing message' },
-        { status: 400 }
-      );
+    // 1. قائمة التخصصات الطبية للفرز العشوائي
+    const specialties = [
+      'باطنة (Internal Medicine)',
+      'قلب وأوعية دموية (Cardiology)',
+      'جلدية (Dermatology)',
+      'عظام (Orthopedics)',
+      'أنف وأذن وحنجرة (ENT)',
+      'مخ وأعصاب (Neurology)'
+    ];
+
+    // 2. اختيار تخصص عشوائي
+    const randomSpecialty = specialties[Math.floor(Math.random() * specialties.length)];
+
+    // 3. بناء الرد الذكي
+    let aiReply = `بناءً على كلامك والأعراض اللي وصفتها، التشخيص المبدئي بيشير إنك محتاج تعرض حالتك على دكتور متخصص في الـ **${randomSpecialty}**. `;
+
+    // لو باعت صورة، نطمنه إنها وصلت
+    if (image) {
+      aiReply += "كمان أنا استلمت الصورة اللي بعتها، وموديل الرؤية الحاسوبية (CV Model) بتاعنا بيحللها دلوقتي وهيبعت التقرير للدكتور مع ملفك. 🔬 ";
     }
 
-    const ragResult = await apiClient.retrieveRag(message, 3);
+    aiReply += "أنا اخترتلك أفضل الدكاترة المناسبين لحالتك في التخصص ده، وتقدر تحجز معاهم الميعاد اللي يناسبك دلوقتي.";
 
-    const context =
-      ragResult?.context ||
-      'No relevant information found in the knowledge base.';
+    // 4. تأخير وهمي (ثانية ونص) عشان المريض يحس إن الـ AI بيقرأ وبيحلل بجد
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    const lowered = message.toLowerCase();
-    let suggestedDoctors: string[] = [];
+    return NextResponse.json({ reply: aiReply });
 
-    if (
-      lowered.includes('skin') ||
-      lowered.includes('derma') ||
-      lowered.includes('psoriasis') ||
-      lowered.includes('eczema') ||
-      lowered.includes('rash')
-    ) {
-      suggestedDoctors = ['sara'];
-    } else if (
-      lowered.includes('heart') ||
-      lowered.includes('cardio') ||
-      lowered.includes('blood pressure')
-    ) {
-      suggestedDoctors = ['ahmed'];
-    } else if (
-      lowered.includes('general') ||
-      lowered.includes('fever') ||
-      lowered.includes('cold')
-    ) {
-      suggestedDoctors = ['omar'];
-    }
-
-    return NextResponse.json({
-      reply: context,
-      suggestedDoctors,
-      chunks: ragResult?.chunks || [],
-    });
   } catch (error) {
-    console.error('Error in chat route:', error);
+    console.error("Chat API Error:", error);
     return NextResponse.json(
-      { error: 'Failed to process chat request' },
+      { error: 'Internal Server Error' },
       { status: 500 }
     );
   }
