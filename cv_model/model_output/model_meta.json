@@ -1,0 +1,34 @@
+{
+  "model": "EfficientNetB0",
+  "img_size": 224,
+  "num_classes": 7,
+  "label_map": {
+    "nv": 0,
+    "mel": 1,
+    "bkl": 2,
+    "bcc": 3,
+    "akiec": 4,
+    "vasc": 5,
+    "df": 6
+  },
+  "label_names": [
+    "nv",
+    "mel",
+    "bkl",
+    "bcc",
+    "akiec",
+    "vasc",
+    "df"
+  ],
+  "best_val_accuracy": 0.6546184738955824,
+  "mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "std": [
+    0.229,
+    0.224,
+    0.225
+  ]
+}
